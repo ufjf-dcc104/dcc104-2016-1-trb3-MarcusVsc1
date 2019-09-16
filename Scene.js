@@ -345,7 +345,7 @@ Scene.prototype.finalizarGame = function(tema){
             this.spritesE[i].comportar = undefined;
             this.spritesE[i].a = Math.PI/2;
             this.spritesE[i].vm = 100; 
-            
+            this.spritesE[i].va = 0;
         }
         this.pc.desenhar = undefined;
     }
