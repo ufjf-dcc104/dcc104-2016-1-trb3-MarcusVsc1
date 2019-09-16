@@ -38,6 +38,7 @@
             survivor: 0,
         }
 
+        //variaveis de inicio de game
         var cena1 = new Scene({ctx: ctx, w: canvas.width, h: canvas.height, img: img, gameStart: 0, survivor: 0, newEnemy: criarInimigo, criarPoder: criarPowerUp});
 
         var pc = new Sprite({comportar: porTeclasDirecionais(teclas), turbo: 5, vidas: 7, x:300, y: 500, props:{tipo:"pc"}});
@@ -69,7 +70,7 @@
                 comportar: lancaPlataforma(pc)});
               break;
             case 5:
-              sprite = new Sprite({x: 300*Math.random(),y:0, vm: 15*Math.random() + 15, h: 50, w:50,  color:"mediumslateblue", vidas: 350, maxVidas: 335, lifebar: 50, pontuacao: 3000, props:{tipo:"npc", spawn: 0, spawn2: 0, chefe: 1}, 
+              sprite = new Sprite({x: 300*Math.random(),y:0, vm: 15*Math.random() + 15, h: 50, w:50,  color:"mediumslateblue", vidas: 335, maxVidas: 335, lifebar: 50, pontuacao: 3000, props:{tipo:"npc", spawn: 0, spawn2: 0, chefe: 1}, 
                 comportar: chefe(pc)});
               break;
           }
@@ -125,8 +126,6 @@
               this.vy = this.vm*Math.sin(this.a);
         }
 
-
-
         //funcao de comportamento inimigo, faz um inimigo perseguir o usuario
         function persegue(alvo) {
            return function(){
@@ -180,7 +179,7 @@
             }
         }
 
-        //funcao de comportamento do inimigo chefe, nao muito diferente da paraAtira no geral
+        //funcao de comportamento do inimigo chefe, nao muito diferente da paraAtira no geral. foi imaginado algo mais complexo, mas foi preferivel deixar apenas 
         function chefe(alvo) {
            return function(){
               this.vm = 15*Math.random() + 15;

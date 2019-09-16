@@ -228,6 +228,7 @@ Scene.prototype.navigationBar = function(t){
     ctx.fillRect(0,this.h-100,this.w,100);
     ctx.fillStyle = "white";
     ctx.font = "10px Arial";
+    //texto do inicio do jogo
     if(this.stage==0){
         ctx.font = "10px Arial";
         ctx.fillText("Seu universo corre perigo! Invasores de outra galáxia pretendem conquistar tudo e todos.",20,this.h-76);
@@ -240,13 +241,12 @@ Scene.prototype.navigationBar = function(t){
         if(this.survivor == 1){
             ctx.font = "20px Eurostile";
             ctx.fillStyle = "lightblue";
-            ctx.fillText("Survivor",235,this.h-625);
-            
-                
+            ctx.fillText("Survivor",235,this.h-625);       
         }
     }else{
         switch(this.endGame){
             case 0:
+                //jogo correndo
                 ctx.fillText("Turbo",200,this.h-50);
                 ctx.fillText("Vidas",20,this.h-50);
                 ctx.fillText("Pontos: "+this.pc.pontuacao,20,this.h-20);
@@ -255,6 +255,7 @@ Scene.prototype.navigationBar = function(t){
                 ctx.fillText("Fase "+Math.floor(this.stage),480,this.h-20);
                 ctx.fillText("Arma: ",200,this.h-20);
                 var tipoTiro;
+                //mostra qual o tipo de tiro
                 switch(this.pc.modeloTiro[this.pc.tiroCorrente]){
                     case 0:
                         tipoTiro = "Pistola";
@@ -277,7 +278,7 @@ Scene.prototype.navigationBar = function(t){
                 ctx.fillStyle = "white";
                 var coracao = new Image();
                 coracao.src = "img/heart.png"
-                var posCoracao = 50;
+                //desenha a barra de turbo
                 ctx.fillStyle = "white";
                 ctx.fillRect(240,this.h-60,150,15);
                 if(this.pc.turbo >= 0){
@@ -285,14 +286,16 @@ Scene.prototype.navigationBar = function(t){
                     ctx.fillRect(240,this.h-60,150,15);
                     ctx.fillStyle = "blue";
                     ctx.fillRect(240,this.h-60,pc.turbo*30,15);
-
                 }
+                //desenha as vidas
+                var posCoracao = 50;
                 for(var i = 0; i < this.pc.vidas; i++){
                     ctx.drawImage(coracao,posCoracao,this.h-60);
                     posCoracao = posCoracao + 20;
                 }
                 break;
             case 1:
+                //fim de jogo com vitoria
                 ctx.font = "10px Arial";
                 ctx.fillText("Os inimigos foram derrotados e o universo está a salvo.",20,this.h-70);
                 ctx.fillText("Tempo: "+this.tempoFinal+"  Pontuação: "+this.pc.pontuacao,20,this.h-50);
@@ -308,6 +311,7 @@ Scene.prototype.navigationBar = function(t){
                 }
                 break;
             case 2:
+                //situacao de derrota
                 ctx.font = "10px Arial";
                 ctx.fillText("Os inimigos se saíram vitoriosos e irão escravizar a galáxia.",20,this.h-70);
                 ctx.fillText("Tempo: "+this.tempoFinal+"  Pontuação: "+this.pc.pontuacao,20,this.h-50);
