@@ -337,7 +337,8 @@ Scene.prototype.finalizarGame = function(tema){
     this.pc.comportar = undefined;
     if(this.endGame==1){
         this.pc.a = 3*Math.PI/2;
-        this.pc.vm = 100;       
+        this.pc.vm = 100;
+        this.pc.va = 0;       
     } else {
         for(var i = 0; i < this.spritesE.length; i++){
             
@@ -545,7 +546,7 @@ Scene.prototype.stageControl = function(t){
                         this.vy = this.vm*Math.sin(this.a);
                         this.props.spawn -= 1/60;
                         if(this.props.spawn <= 0){
-                            this.props.spawn = 3;
+                            this.props.spawn = 2.75;
                                 var novo = new Sprite({
                                 x: this.x, y: this.y, vm: 70*Math.random()+50, comportar: persegue(alvo), drop: 1, maxVidas: 3,
                                 vidas: 3, 
