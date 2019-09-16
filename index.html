@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>=======FLEW FAR FASTER=======</title>
+    <style>
+      @font-face {
+        font-family: Eurostile;
+        src: url("font/eurostile.otf");
+        }
+    </style>
+    <script src="Sprite.js"></script>
+    <script src="Scene.js"></script>
+</head>
+<body>
+
+    <canvas></canvas>
+
+    <script>
+        var canvas = document.querySelector("canvas");
+        canvas.width = 600;
+        canvas.height = 700;
+        var img = new Image();
+        
+        var ctx = canvas.getContext("2d");
+        img.src = "img/bg.jpg";
+        
+        
+        var teclas = {
+            esquerda: 0,
+            cima: 0,
+            direita: 0,
+            baixo: 0,
+            espaco: 0,
+            turbo: 0,
+            tipoTiro: 0,
+            survivor: 0,
+        }
+
+        var cena1 = new Scene({ctx: ctx, w: canvas.width, h: canvas.height, img: img, gameStart: 0, survivor: 0, newEnemy: criarInimigo, criarPoder: criarPowerUp});
+
+        var pc = new Sprite({comportar: porTeclasDirecionais(teclas), turbo: 5, vidas: 7, x:300, y: 500, props:{tipo:"pc"}});
+        pc.modeloTiro.push(0);
+        cena1.adicionar(pc);
+
+        
+        
+        //funcao de criar inimigos, recebe um numero por parametro e cria um inimigo de determinado tipo
+        function criarInimigo(tipo){
+          var sprite;
+          switch(tipo){
+            case 0:
+              sprite = new Sprite({x: 600*Math.random(),y:0, vm: 50*Math.random()+30, w: 15, color:"red", vidas: 1, maxVidas: 1, powerUp:1, pontuacao: 50, props:{tipo:"npc"}, comportar: persegue(pc)});
+              break;
+            case 1:
+              sprite = new Sprite({x: 600*Math.random(),y:0, vm: 80, h: 20, color:"indigo", props:{tipo:"npc"}, vidas:4, 
+                maxVidas:4, pontuacao: 80, comportar: persegue(pc), powerUp:2});
+              break;
+            case 2:
+              sprite = new Sprite({x: 300*Math.random(),y:0, vm: 40*Math.random() + 30, h: 20, color:"green", vidas: 3, maxVidas: 3, powerUp:2, pontuacao: 100, props:{tipo:"npc", spawn: 0}, comportar: persegueSpawn(pc)});
+              break;
+            case 3:
+              sprite = new Sprite({x: 300*Math.random(),y:0, vm: 40*Math.random() + 30, h: 20, w:20,  color:"orange", vidas: 5, maxVidas: 5, powerUp:3, pontuacao: 150, props:{tipo:"npc", spawn: 0}, 
+                comportar: paraAtira(pc)});
+              break;
+            case 4:
+              sprite = new Sprite({x: 300*Math.random(),y:0, vm: 30*Math.random() + 40, h: 35, w:10,  color:"chocolate", vidas: 8, maxVidas: 8, powerUp:3, pontuacao: 140, props:{tipo:"npc", spawn: 2}, 
+                comportar: lancaPlataforma(pc)});
+              break;
+            case 5:
+              sprite = new Sprite({x: 300*Math.random(),y:0, vm: 15*Math.random() + 15, h: 50, w:50,  color:"mediumslateblue", vidas: 350, maxVidas: 335, lifebar: 50, pontuacao: 3000, props:{tipo:"npc", spawn: 0, spawn2: 0, chefe: 1}, 
+                comportar: chefe(pc)});
+              break;
+          }
+          this.adicionar(sprite);
+        }
+        //funcao de comportamento inimigo, inimigo persegue usuario e faz outro inimigo em um determinado espaco de tempo
+        function persegueSpawn(alvo){
+        	return function(){
+           		alfa = calculoAngulo(this,alvo);	
+           		
+           		if(this.x <= alvo.x && this.y <= alvo.y)
+           			this.a = alfa*-1;
+           		else {
+           			if(this.x < alvo.x && this.y > alvo.y)
+           				this.a = alfa;
+           		else {
+           			if(this.x > alvo.x && this.y < alvo.y)
+           				this.a = (alfa+Math.PI);
+           		else{
+           			this.a = (alfa+Math.PI)*-1;
+           		}}}
+           		this.vx = this.vm*Math.cos(this.a);
+        			this.vy = this.vm*Math.sin(this.a);
+        			this.props.spawn -= 1/60;
+        			if(this.props.spawn <= 0){
+        				this.props.spawn = 2;
+        				var novo = new Sprite({
+        					x: this.x, y: this.y, vm: 80*Math.random()+20, comportar: persegue(alvo), drop: 1, vidas: 1, color: "yellow", props:{tipo:"npc"}
+        				});
+        				this.scene.adicionar(novo);
+        			}
+                }
+
+        }
+
+        //funcao que cria os powerups na tela
+        function criarPowerUp(poder,xO,yO){
+            
+              sprite = new Sprite({x: xO,y: yO, w: 32, vm: 80*Math.random()+20, comportar: moverPoder(pc), 
+                powerUp:poder, props:{tipo:"poder"}, desenhar:function(ctx){
+                  ctx.fillStyle = "rgb("+Math.random()*255+","+Math.random()*255+","+Math.random()*255+")";
+                  ctx.fillRect(this.x, this.y, this.w-17, this.w-17);
+                  ctx.strokeStyle = "black";
+                  ctx.strokeRect(this.x, this.y, this.w-17, this.w-17);
+                }});
+              sprite.a = Math.random()*Math.PI;
+              this.adicionar(sprite);
+        }
+
+        //funcao de mover powerups
+        function moverPoder(alvo){
+              this.vx = this.vm*Math.cos(this.a);
+              this.vy = this.vm*Math.sin(this.a);
+        }
+
+
+
+        //funcao de comportamento inimigo, faz um inimigo perseguir o usuario
+        function persegue(alvo) {
+           return function(){
+           		
+           		var alfa = calculoAngulo(this,alvo);	
+           		
+           		if(this.x <= alvo.x && this.y <= alvo.y)
+           			this.a = alfa*-1;
+           		else {
+           			if(this.x < alvo.x && this.y > alvo.y)
+           				this.a = alfa;
+           		else {
+           			if(this.x > alvo.x && this.y < alvo.y)
+           				this.a = (alfa+Math.PI);
+           		else{
+           			this.a = (alfa+Math.PI)*-1;
+           		}
+           		}
+           		}
+           		this.vx = this.vm*Math.cos(this.a);
+    		    	this.vy = this.vm*Math.sin(this.a);
+            }
+        }
+
+        //funcao de comportamento inimigo, faz o inimigo atirar
+        function paraAtira(alvo) {
+           return function(){
+
+              alfa = calculoAngulo(this,alvo);
+              if(this.x <= alvo.x && this.y <= alvo.y)
+                this.a = alfa*-1;
+              else {
+                if(this.x < alvo.x && this.y > alvo.y)
+                  this.a = alfa;
+              else {
+                if(this.x > alvo.x && this.y < alvo.y)
+                  this.a = (alfa+Math.PI);
+              else{
+                this.a = (alfa+Math.PI)*-1;
+              }}}
+              this.vx = this.vm*Math.cos(this.a);
+              this.vy = this.vm*Math.sin(this.a);
+              this.props.spawn -= 1/80;
+              if(this.props.spawn <= 0){
+                this.props.spawn = 2;
+                var novo = new Sprite({
+                  x: this.x, y: this.y, a: this.a, vm:240, color: "black", w:6, h: 6, props:{tipo:"tiroE"}
+                        });
+                this.scene.adicionar(novo);
+              }
+            }
+        }
+
+        //funcao de comportamento do inimigo chefe, nao muito diferente da paraAtira no geral
+        function chefe(alvo) {
+           return function(){
+              this.vm = 15*Math.random() + 15;
+
+              alfa = calculoAngulo(this,alvo);
+              if(this.x <= alvo.x && this.y <= alvo.y)
+                this.a = alfa*-1;
+              else {
+                if(this.x < alvo.x && this.y > alvo.y)
+                  this.a = alfa;
+              else {
+                if(this.x > alvo.x && this.y < alvo.y)
+                  this.a = (alfa+Math.PI);
+              else{
+                this.a = (alfa+Math.PI)*-1;
+              }}}
+              this.vx = this.vm*Math.cos(this.a);
+              this.vy = this.vm*Math.sin(this.a);
+              this.props.spawn -= 1/80;
+              if(this.props.spawn <= 0){
+                this.props.spawn = 2;
+                var novo = new Sprite({
+                  x: this.x, y: this.y, a: this.a, vm:240, color: "black", w:6, h: 6, props:{tipo:"tiroE"}
+                        });
+                this.scene.adicionar(novo);
+              }
+            }
+        }
+
+        //funcao de comportamento inimigo, faz o inimigo atirar uma plataforma. usa a mesma logica da paraAtira
+        function lancaPlataforma(alvo) {
+           return function(){
+
+              alfa = calculoAngulo(this,alvo);
+              if(this.x <= alvo.x && this.y <= alvo.y)
+                this.a = alfa*-1;
+              else {
+                if(this.x < alvo.x && this.y > alvo.y)
+                  this.a = alfa;
+              else {
+                if(this.x > alvo.x && this.y < alvo.y)
+                  this.a = (alfa+Math.PI);
+              else{
+                this.a = (alfa+Math.PI)*-1;
+              }}}
+              this.vx = this.vm*Math.cos(this.a);
+              this.vy = this.vm*Math.sin(this.a);              
+              this.props.spawn -= 1/60;
+              if(this.props.spawn <= 0){
+                this.props.spawn = 5;
+                var novo = new Sprite({
+                  x: this.x, y: this.y - 20, a: Math.PI/2, vm:this.vm, color: "gray", w:120, h: 2, desenhar: function(ctx){
+                    ctx.globalAlpha = 1;
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y, this.w, this.h);
+                    ctx.strokeStyle = "black";
+                    ctx.strokeRect(this.x, this.y, this.w, this.h);
+                    ctx.globalAlpha = 0.5;
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y-3, this.w, this.h);
+                    ctx.strokeStyle = "black";
+                    ctx.strokeRect(this.x, this.y-3, this.w, this.h);
+                    ctx.globalAlpha = 0.25;
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y-6, this.w, this.h);
+                    ctx.strokeStyle = "black";
+                    ctx.strokeRect(this.x, this.y-6, this.w, this.h);
+                    ctx.globalAlpha = 0.125;
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y-9, this.w, this.h);
+                    ctx.strokeStyle = "black";
+                    ctx.strokeRect(this.x, this.y-9, this.w, this.h);
+                    ctx.globalAlpha = 0.0625;
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y-12, this.w, this.h);
+                    ctx.strokeStyle = "black";
+                    ctx.strokeRect(this.x, this.y-12, this.w, this.h);
+                    ctx.globalAlpha = 1;                    
+                  }, props:{tipo:"tiroE"}
+                        });
+                this.scene.adicionar(novo);
+              }
+            }
+
+        }
+
+        //funcao de calculo de angulo, tomando como base o usuario
+        function calculoAngulo(p, alvo){
+        	var x1 = p.x - alvo.x;
+       		var y1 = p.y - alvo.y;
+       		var oX = p.x - alvo.x;
+       		var oY = 0;
+       		var normaX = Math.sqrt(Math.pow(x1,2) + Math.pow(y1,2));
+       		var normaA = Math.sqrt(Math.pow(oX,2) + Math.pow(oY,2));
+       		var prodEscalar = (x1*oX)+(y1*oY);
+
+       		return Math.acos((prodEscalar)/(normaA*normaX))*-1;
+
+        }
+
+        //funcao de contagem de tempo e movimentacao do jogo
+        function passo(t) {
+            dt = (t-anterior)/1000;
+            cena1.passo(t,dt);
+            anterior = t;            
+            requestAnimationFrame(passo);
+        }
+
+        var dt, anterior = 0;
+        
+        requestAnimationFrame(passo);
+
+        //funcao de comportamento do usuario
+        function porTeclasDirecionais(teclas){
+            return function() {
+                if(teclas.esquerda) { this.va = -3.5 }
+                if(teclas.direita) { this.va = +3.5 }
+                if(teclas.esquerda === teclas.direita) { this.va = 0}
+
+                if(teclas.cima && !teclas.turbo) { this.vm = +220 }
+                if(teclas.baixo) { this.vm = -120 }
+                if(teclas.cima === teclas.baixo) { this.vm = 0 }
+                
+                if(teclas.cima === teclas.turbo && teclas.cima && this.turbo >= 0) { 
+                  this.vm = +450
+                  this.turbo = this.turbo - 0.05;
+                }
+
+                if(teclas.cima === teclas.turbo && teclas.cima && this.turbo < 0) { teclas.turbo = 0; }              
+                if(teclas.turbo == 0 && this.turbo < 5){ this.turbo = this.turbo + 0.03;}
+                  
+
+                if(teclas.espaco && this.cooldown <=0) { 
+                  var tiro;
+                  
+                  switch(this.modeloTiro[this.tiroCorrente]){
+                      case 0:
+                        this.cooldown = 0.05;
+                        tiro = new Sprite({
+                        x: this.x, y: this.y, a: this.a-0.1+0.2*Math.random(),
+                        vm:240, color: "green", w:6, h: 3, props:{tipo:"tiro", atravessa:0}
+                        })
+                        this.cooldown = 0.5;
+                        break;
+                      case 1:
+                        tiro = new Sprite({
+                        x: this.x, y: this.y, a: this.a-0.1,
+                        vm:240, color: "pink", w:6, h: 3, props:{tipo:"tiro", atravessa:0}
+                        })
+                        this.scene.adicionar(tiro); 
+
+                        tiro = new Sprite({
+                        x: this.x, y: this.y, a: this.a,
+                        vm:240, color: "pink", w:6, h: 3, props:{tipo:"tiro", atravessa:0}
+                        })
+                        this.scene.adicionar(tiro);
+                        tiro = new Sprite({
+                        x: this.x, y: this.y, a: this.a+0.1,
+                        vm:240, color: "pink", w:6, h: 3, props:{tipo:"tiro", atravessa:0}
+                        })
+                        this.cooldown = 0.7;
+                        break;
+                      case 2:
+                        tiro = new Sprite({
+                        x: this.x, y: this.y, a: this.a,
+                        vm:Math.cos(dt/1000)*100, color: "purple", w:6, h: 3, props:{tipo:"tiro", atravessa:0}
+                        })
+                        this.scene.adicionar(tiro);
+                        this.cooldown = 0.15;
+                        break;
+                      case 3:
+                        tiro = new Sprite({
+                        x: this.x, y: this.y, a: this.a, vm:300,
+                        color: "black", w:16, h: 16, desenhar:function(ctx){
+                          ctx.globalAlpha = 0.5;
+                          ctx.fillStyle = this.color;
+                          ctx.fillRect(this.x, this.y, this.w, this.h);
+                          ctx.strokeStyle = "black";
+                          ctx.strokeRect(this.x, this.y, this.w, this.h);
+                          ctx.globalAlpha = 1;
+                        }, props:{tipo:"tiro", atravessa:1}
+                        })
+                        this.scene.adicionar(tiro);
+                        this.cooldown = 1.5;
+                        break;
+
+                  }
+                  this.scene.adicionar(tiro); 
+                    };
+            }
+        }
+
+        //funcao para trocar o tipo de tiro atual
+        function trocaTipoTiro(){
+          //if(teclas.tipoTiro == 0) {teclas.tipoTiro = 1}
+          //else{teclas.tipoTiro = 0}
+          cena1.pc.tiroCorrente++;
+          if(cena1.pc.tiroCorrente == cena1.pc.modeloTiro.length){
+            cena1.pc.tiroCorrente = 0;
+          }
+        }
+
+        function entraModoSurvivor(){
+            if(cena1.survivor == 0 && cena1.gameStart == 0){
+              cena1.survivor = 1;
+              cena1.pc.vidas = 1;
+            } else{
+              if(cena1.survivor == 1 && cena1.gameStart == 0){
+              cena1.survivor = 0;
+              cena1.pc.vidas = 7;
+            }
+            }
+            
+        }
+
+        //Configura controles
+        addEventListener("keydown", function (e) {
+            switch (e.keyCode) { 
+                case 84:
+                    entraModoSurvivor();
+                    break;               
+                case 65:
+                    teclas.esquerda = 1;
+                    break;
+                case 87:
+                    teclas.cima = 1;
+                    cena1.gameStart = 1;
+                    break;
+                case 68:
+                    teclas.direita = 1;
+                    break;
+                case 83:
+                    teclas.baixo = 1;
+                    cena1.gameStart = 1;
+                    break;
+                case 74:
+                    teclas.espaco = 1;
+                    break;
+                case 75:
+                    if(cena1.pc.turbo >= 5){teclas.turbo = 1};
+                	  break;
+                 case 76:              
+                    trocaTipoTiro();
+                    break;
+                default:
+                    break;
+            }
+        });
+        addEventListener("keyup", function (e) {
+            switch (e.keyCode) {
+                case 65:
+                    teclas.esquerda = 0;
+                    break;
+                case 87:
+                    teclas.cima = 0;
+                    break;
+                case 68:
+                    teclas.direita = 0;
+                    break;
+                case 83:
+                    teclas.baixo = 0;
+                    break;
+                case 74:
+                    teclas.espaco = 0;
+                	break;
+                case 75:
+                    teclas.turbo = 0;
+                  	break;
+
+                default:
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>
