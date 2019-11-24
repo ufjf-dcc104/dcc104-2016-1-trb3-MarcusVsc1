@@ -91,6 +91,7 @@ GameManager.prototype.criarEstagios = function() {
                 this.countRespawn = 0;
                 this.tempoTotal = t - this.startPoint;
                 this.startPoint=t;
+                this.respawner = 20;
                 for(var i = 0; i < 2; i++){
                     this.newEnemy(3,this.pcs[Math.floor(Math.random()*this.pcs.length)]);
                 }
@@ -154,7 +155,7 @@ GameManager.prototype.criarEstagios = function() {
                     this.musica.src = "assets/tema4.mp3"
                 }
                 this.musica.play();
-
+                this.respawner = 20;
             }
             if(((this.respawner <= 0) || (this.spritesE.length == 0 && this.countRespawn < 6))){
                 if(this.countRespawn%2!=0){
@@ -182,26 +183,28 @@ GameManager.prototype.criarEstagios = function() {
 
     evento = function() {
         return function(t) {
-            if((this.countRespawn >=6 && this.spritesE.length == 0) || tempo>=108){
-                this.stageIndex++;
+            if((this.countRespawn >= 4 && this.spritesE.length == 0) || tempo>=108){
                 this.pcs[0].pontuacao += Math.floor((108-tempo)*60);
                 if(this.survivor == 0){
                     for(var i = 0; i < this.pcs.length; i++)
                         if(this.pcs[i].vidas<7){this.pcs[i].vidas++;}
-                };
-                this.musica.src = "assets/tema4.mp3"
+                }
+                for(var i = 0; i < this.spritesE.length; i++){
+                    console.log("entrou no loop de destruicao");
+                    this.assets.play("explosion");
+                    this.adicionar(new Animation({x: this.spritesE[i].x, y:this.spritesE[i].y, imagem: "explosion"}));
+                    this.toRemove.push(this.spritesE[i]);
+                }
+                this.stageIndex++;
+                this.musica.src = "assets/tema5.mp3"
                 this.musica.play();
                 this.countRespawn = 0;
                 this.tempoTotal = t - this.startPoint;
                 this.startPoint=t;
-                for(var i = 5; i < this.spritesE.length; i++){
-                    this.toRemove.push(this.spritesE[i]);
-                    this.assets.play("explosion");
-                    this.adicionar(new Animation({x: this.spritesE[i].x, y:this.spritesE[i].y, imagem: "explosion"}));
-                }
                 this.newEnemy(5,this.pcs[Math.floor(Math.random()*this.pcs.length)]);
+                this.respawner = 20;
             }
-            if(((this.respawner <= 0) || (this.spritesE.length == 0 && this.countRespawn < 5))){
+            if(((this.respawner <= 0) || (this.spritesE.length == 0 && this.countRespawn < 4))){
                 if(this.countRespawn%2!=0){
                     for(var i = 0; i < this.countRespawn+3; i++){
                     this.newEnemy(7,this.pcs[Math.floor(Math.random()*this.pcs.length)]);
@@ -236,15 +239,18 @@ GameManager.prototype.criarEstagios = function() {
                 this.finalizarGame("assets/victory.mp3");
             }
             //contador de 5 segundos do especial do chefe
-            if(tempo>= 123 && tempo < 128){
+            if(tempo > 123){
+                console.log(128-tempo);
                 ctx.fillStyle = "white";
                 ctx.font = "30px Eurostile";
                 ctx.fillText(Math.floor(128-tempo),495,this.h-645);
             }
-            if(this.respawner<=0 && tempo<128){
+            if(this.respawner<=0){
                 this.newEnemy(Math.floor(Math.random()*3 + 1),this.pcs[Math.floor(Math.random()*this.pcs.length)]);
                 this.respawner = 12;
-                this.countRespawn++;
+            }
+            else{
+                this.respawner -= 1/60;
             }
             if(tempo >= 128){
                 this.eventIndex++;
@@ -252,6 +258,50 @@ GameManager.prototype.criarEstagios = function() {
         }
     }
     eventoLista.push(evento);
+
+    evento = function(){
+        return function(){
+            //especial do chefe
+            for(var i = 0; i < this.spritesE.length;i++){
+                if(this.spritesE[i].props.chefe != undefined){
+                    this.spritesE[i].vm = 0;
+                    this.spritesE[i].comportar = especialDoChefe();
+                }
+            }
+            this.eventIndex++;
+        }
+    }
+    eventoLista.push(evento);
+
+    evento = function(){
+        return function(){
+            //derrota
+            if(tempo>=167){
+            this.endGame = 2;
+            this.finalizarGame("assets/gameover.mp3");
+            }else{
+                //vitoria
+                if(this.spritesE.length == 0){
+                    this.endGame = 1;
+                    for (var i = 0; i < this.pcs.length; i++) {
+                        this.pcs[i].pontuacao += Math.floor((167-tempo)*40);
+                    }
+                    this.finalizarGame("assets/victory.mp3");
+                } 
+            }
+            if(tempo > 143){
+                for(i = 0; i < this.spritesE.length;i++){
+                    if(this.spritesE[i].props.chefe != undefined){
+                        this.spritesE[i].vm = 40;
+                        this.spritesE[i].comportar = comportamentoFinal(this.pcs[Math.floor(Math.random()*this.pcs.length)]);
+                    }
+                }
+            }
+        }
+    }
+    eventoLista.push(evento);
+
+    this.estagios.push(this.fabricaDeEstagios(bg, eventoLista));
 
 
 

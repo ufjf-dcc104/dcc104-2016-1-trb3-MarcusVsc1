@@ -221,6 +221,11 @@ Scene.prototype.checaColisao = function(){
                     this.assets.play("paralyze");
                     this.pcs[j].vidas--;
                     this.pcs[j].imune=2;
+                    if(this.pcs[j].vidas == 0){
+                        this.adicionar(new Animation({x: this.pcs[j].x, y:this.pcs[j].y, imagem: "explosion"}));
+                        this.assets.play("explosion");
+                        this.toRemove.push(this.pcs[j]);
+                    }
                 }
             }
             if(this.spritesTE[i] != null){
@@ -376,7 +381,7 @@ Scene.prototype.navigationBar = function(t){
                 ctx.fillStyle = "white";
                 ctx.font = "10px Arial";
                 ctx.fillText("Tempo:"+this.tempoFinal,450,this.h-50);
-                ctx.fillText("Fase "+Math.floor(this.stage),450,this.h-20);
+                ctx.fillText("Fase "+Math.floor(this.stageIndex+1),450,this.h-20);
                 if(this.endGame==0){this.tempoFinal = (Math.round(t-this.startPoint+this.tempoTotal)/1000).toFixed(2);}
                 if(pc.vidas > 0){
                     ctx.fillText("Turbo",200,this.h-50);
@@ -479,7 +484,8 @@ Scene.prototype.navigationBar = function(t){
                 //fim de jogo com vitoria
                 ctx.font = "10px Arial";
                 ctx.fillText("Os inimigos foram derrotados e o universo está a salvo.",20,this.h-70);
-                ctx.fillText("Tempo: "+this.tempoFinal+"  Pontuação: "+this.pcs[0].pontuacao,20,this.h-50);
+                ctx.fillText("Tempo: "+this.tempoFinal+"  Pontuação P1: "+pc.pontuacao+
+                    "  Pontuação P2: "+pc2.pontuacao,20,this.h-50);
                 ctx.fillText("Jogo feito por Marcus Vinícius V. A. Cunha",395,this.h-50);
                 ctx.fillText("Aperte F5 caso queira reiniciar o jogo.",20,this.h-30);
                 ctx.fillText("Matrícula 201776013 marcus.vasconcelos@ice.ufjf.br",345,this.h-30);
@@ -521,7 +527,9 @@ Scene.prototype.finalizarGame = function(tema){
     this.musica.src = tema;
     this.musica.loop = true;
     this.musica.play();
-    for(var i = 0; i <this.pcs.size; i++){
+    console.log("finalizou");
+    for(var i = 0; i <this.pcs.length; i++){
+        console.log("mudou comportamento")
         this.pcs[i].comportar = undefined;
     }
     if(this.endGame==1){
