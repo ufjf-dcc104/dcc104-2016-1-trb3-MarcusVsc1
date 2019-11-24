@@ -194,6 +194,11 @@ GameManager.prototype.criarEstagios = function() {
                 this.countRespawn = 0;
                 this.tempoTotal = t - this.startPoint;
                 this.startPoint=t;
+                for(var i = 5; i < this.spritesE.length; i++){
+                    this.toRemove.push(this.spritesE[i]);
+                    this.assets.play("explosion");
+                    this.adicionar(new Animation({x: this.spritesE[i].x, y:this.spritesE[i].y, imagem: "explosion"}));
+                }
                 this.newEnemy(5,this.pcs[Math.floor(Math.random()*this.pcs.length)]);
             }
             if(((this.respawner <= 0) || (this.spritesE.length == 0 && this.countRespawn < 5))){
@@ -216,6 +221,37 @@ GameManager.prototype.criarEstagios = function() {
     eventoLista.push(evento);
 
     this.estagios.push(this.fabricaDeEstagios(bg, eventoLista));
+
+    eventoLista = [];
+    bg = "bg5";
+
+    evento = function(){
+        return function(t){
+            //vitoria
+            if(this.spritesE.length == 0){
+                this.endGame = 1;
+                for (var i = 0; i < this.pcs.length; i++) {
+                    this.pcs[i].pontuacao += Math.floor((167-tempo)*40);
+                }
+                this.finalizarGame("assets/victory.mp3");
+            }
+            //contador de 5 segundos do especial do chefe
+            if(tempo>= 123 && tempo < 128){
+                ctx.fillStyle = "white";
+                ctx.font = "30px Eurostile";
+                ctx.fillText(Math.floor(128-tempo),495,this.h-645);
+            }
+            if(this.respawner<=0 && tempo<128){
+                this.newEnemy(Math.floor(Math.random()*3 + 1),this.pcs[Math.floor(Math.random()*this.pcs.length)]);
+                this.respawner = 12;
+                this.countRespawn++;
+            }
+            if(tempo >= 128){
+                this.eventIndex++;
+            }
+        }
+    }
+    eventoLista.push(evento);
 
 
 
