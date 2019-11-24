@@ -194,6 +194,7 @@ GameManager.prototype.criarEstagios = function() {
                     this.assets.play("explosion");
                     this.adicionar(new Animation({x: this.spritesE[i].x, y:this.spritesE[i].y, imagem: "explosion"}));
                     this.toRemove.push(this.spritesE[i]);
+                    this.toRemove.push(this.spritesTE[i]);
                 }
                 this.stageIndex++;
                 this.musica.src = "assets/tema5.mp3"
