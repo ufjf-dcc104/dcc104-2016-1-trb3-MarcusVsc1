@@ -17,6 +17,7 @@ function Sprite(params = {}) {
         comportar: undefined,
         scene: undefined,
         atirar: undefined,
+        imagem: null,
         tiroCorrente: 0,
         modeloTiro: [],
         vidas: 0,
@@ -24,8 +25,17 @@ function Sprite(params = {}) {
         turbo: 0,
         powerUp: 0,
         drop: 0,
-        lifebar: 23,
+        lifebar: 30,
         pontuacao: 0,
+        teclas: {
+            esquerda: 0,
+            cima: 0,
+            direita: 0,
+            baixo: 0,
+            espaco: 0,
+            turbo: 0,
+            survivor: 0,
+        }
     }
     Object.assign(this, exemplo, params);
 }
@@ -36,32 +46,13 @@ Sprite.prototype.constructor = Sprite;
 Sprite.prototype.desenhar = function(ctx) {
     ctx.save();
     ctx.translate(this.x, this.y);
-    
-    ctx.rotate(this.a);
-    ctx.fillStyle = this.color;
-    ctx.strokeStyle = "black";
     if(this.imune > 0){
       ctx.globalAlpha = 0.5*Math.cos(60*this.imune);
     }
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(-this.w*1.5, -this.h/1.5);
-    ctx.lineTo(-this.lineWidth, +this.h/4);
-    ctx.lineTo(-this.w, +this.h/4);
-    ctx.lineTo(-this.w, +this.h);
-    ctx.lineTo(+this.w*1.5, +this.h/8);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
+    ctx.rotate(this.a + Math.PI/2);
+    ctx.drawImage(this.scene.assets.img(this.imagem),-this.w/2,-this.h/2,this.w,this.h);
     ctx.globalAlpha = 1.0;
-    if(this.props.tipo != "pc" && this.maxVidas > 1){
-        ctx.fillStyle = "white";
-        ctx.fillRect(this.x,this.y-this.w-15,this.lifebar,5);
-        ctx.fillStyle = "red";
-        ctx.fillRect(this.x,this.y-this.w-15,(this.lifebar*this.vidas)/this.maxVidas,5);
-
-    }
+    ctx.restore();
 };
 
 
