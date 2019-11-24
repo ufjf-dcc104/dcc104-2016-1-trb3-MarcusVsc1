@@ -241,8 +241,8 @@ GameManager.prototype.criarEstagios = function() {
             //contador de 5 segundos do especial do chefe
             if(tempo > 123){
                 console.log(128-tempo);
-                ctx.fillStyle = "white";
                 ctx.font = "30px Eurostile";
+                ctx.fillStyle = "white";
                 ctx.fillText(Math.floor(128-tempo),495,this.h-645);
             }
             if(this.respawner<=0){

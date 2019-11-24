@@ -407,6 +407,10 @@ Scene.prototype.navigationBar = function(t){
                             tipoTiro = "Canhão";
                             ctx.fillStyle = "powderblue";
                             break;
+                        case 4:
+                            tipoTiro = "Míssil";
+                            ctx.fillStyle = "coral";
+                            break;
                     }
                     ctx.fillText(tipoTiro,230,this.h-20);
                     ctx.fillStyle = "white";

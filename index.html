@@ -62,6 +62,7 @@
         assetsMng.loadAudio("shot2","assets/shot2.mp3");
         assetsMng.loadAudio("shot3","assets/shot3.mp3");
         assetsMng.loadAudio("shot4","assets/shot4.ogg");
+        assetsMng.loadAudio("shot5","assets/shot5.mp3");
         assetsMng.loadAudio("turbo","assets/turbo.ogg");
         assetsMng.loadAudio("item","assets/item.ogg");
         assetsMng.loadAudio("paralyze","assets/paralyze.ogg");
@@ -138,11 +139,11 @@
               sprite = new Sprite({x: (cena1.w/2) - 30, y:0, vm: 15*Math.random() + 15, h: 60, w:60, imagem: "enemy_9", vidas: Math.ceil(335*cena1.multiplier), maxVidas: Math.ceil(335*cena1.multiplier), lifebar: 50, pontuacao: 3000, desenhar: desenhaNPC, props:{tipo:"npc", spawn: 0, spawn2: 0, chefe: 1}, comportar: chefe(pec)});
               break;
             case 6:
-              sprite = new Sprite({x: cena1.w*Math.random(),y:0, vm: 30*Math.random() + 40, h: 40, w:40,  imagem: "enemy_5", vidas: Math.ceil(12*cena1.multiplier), maxVidas: Math.ceil(12*cena1.multiplier), powerUp:3, pontuacao: 320, desenhar: desenhaNPC, props:{tipo:"npc", spawn: 2}, 
+              sprite = new Sprite({x: cena1.w*Math.random(),y:0, vm: 30*Math.random() + 40, h: 40, w:40,  imagem: "enemy_5", vidas: Math.ceil(12*cena1.multiplier), maxVidas: Math.ceil(12*cena1.multiplier), powerUp:4, pontuacao: 320, desenhar: desenhaNPC, props:{tipo:"npc", spawn: 2}, 
                 comportar: lancaMisseis(pec)});
               break;
             case 7:
-              sprite = new Sprite({x: cena1.w*Math.random(),y:0, vm: 30*Math.random() + 40, h: 40, w:40,  imagem: "enemy_10", vidas: Math.ceil(12*cena1.multiplier), maxVidas: Math.ceil(12*cena1.multiplier), powerUp:3, pontuacao: 350, desenhar: desenhaNPC, props:{tipo:"npc", spawn: 2}, 
+              sprite = new Sprite({x: cena1.w*Math.random(),y:0, vm: 30*Math.random() + 40, h: 40, w:40,  imagem: "enemy_10", vidas: Math.ceil(12*cena1.multiplier), maxVidas: Math.ceil(12*cena1.multiplier), powerUp:4, pontuacao: 350, desenhar: desenhaNPC, props:{tipo:"npc", spawn: 2}, 
                 comportar: lancaYoYo(pec)});
               break;
           }
@@ -374,8 +375,14 @@
 
         function missil(alvo) {
           return function(){
-            if(alvo.vidas == 0){
-                if(this.scene.pcs.length > 0){alvo = this.scene.pcs[0]};
+            if(alvo == undefined || alvo == null || alvo.vidas == 0){
+                if(this.scene.pcs.length > 0 && this.props.tipo == "tiroE"){alvo = this.scene.pcs[0];
+                }
+                else{
+                  this.scene.toRemove.push(this);
+                  this.scene.assets.play("explosion");
+                  this.scene.adicionar(new Animation({x: this.x, y:this.y, imagem: "explosion"}));
+                }
             }
             var dx = alvo.x - this.x;
             var dy = alvo.y - this.y;
@@ -552,10 +559,23 @@
                         this.scene.adicionar(tiro);
                         this.cooldown = 1.5;
                         break;
+                      case 4:
+                        if(this.scene.spritesE.length > 0){
+                          var posicao = Math.floor( Math.random()*this.scene.spritesE.length);
+                          tiro = new Sprite({
+                          x: this.x, y: this.y, a: this.a, jogador: this, frame: 0,
+                          vm:30, imagem: "missil", comportar: missil(this.scene.spritesE[posicao]),
+                          w:12, h: 15, props:{tipo:"tiro", atravessa:0}
+                          })
+                          this.scene.adicionar(tiro);
+                          this.cooldown = 0.75;
+                          assetsMng.play("shot5"); 
+                        }
+                        break;
 
                   }
                   this.scene.adicionar(tiro); 
-                    };
+                };
             }
         }
 
