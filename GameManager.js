@@ -7,6 +7,8 @@ function GameManager(pc) {
 }
 
 GameManager.prototype.criarEstagios = function() {
+
+    //fase 1
     var eventoLista = [];
     var bg = "bg1";
     
@@ -61,7 +63,6 @@ GameManager.prototype.criarEstagios = function() {
             }
             this.respawner = 20;
             this.countRespawn++;
-            
         }
         else{this.respawner -= 1/60;}
         }
@@ -70,7 +71,7 @@ GameManager.prototype.criarEstagios = function() {
 
     this.estagios.push(this.fabricaDeEstagios(bg, eventoLista));
 
-
+    //fase 2
     eventoLista = [];
     bg = "bg2";
 
@@ -117,6 +118,7 @@ GameManager.prototype.criarEstagios = function() {
 
     this.estagios.push(this.fabricaDeEstagios(bg, eventoLista));
 
+    //fase 3
     eventoLista = [];
     bg = "bg3";
 
@@ -178,6 +180,7 @@ GameManager.prototype.criarEstagios = function() {
 
     this.estagios.push(this.fabricaDeEstagios(bg, eventoLista));
 
+    //fase 4
     eventoLista = [];
     bg = "bg4";
 
@@ -229,6 +232,7 @@ GameManager.prototype.criarEstagios = function() {
 
     this.estagios.push(this.fabricaDeEstagios(bg, eventoLista));
 
+    //fase 5
     eventoLista = [];
     bg = "bg5";
 
@@ -251,7 +255,7 @@ GameManager.prototype.criarEstagios = function() {
             }
             if(this.respawner<=0){
                 this.newEnemy(Math.floor(Math.random()*3 + 1),this.pcs[Math.floor(Math.random()*this.pcs.length)]);
-                this.respawner = 12;
+                this.respawner = 8;
             }
             else{
                 this.respawner -= 1/60;

@@ -579,8 +579,8 @@ Scene.prototype.rodarEvento = function(evento, t) {
 
 Scene.prototype.gameDefiner = function (t) {
     this.estagio = this.gamer.estagios[this.stageIndex];
-    if(this.endGame == 0){this.rodarEvento(this.estagio.eventos[this.eventIndex],t);}
     this.background();
+    if(this.endGame == 0){this.rodarEvento(this.estagio.eventos[this.eventIndex],t);}
 }
 
 //funcao que controla o jogo em si
