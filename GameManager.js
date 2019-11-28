@@ -138,7 +138,7 @@ GameManager.prototype.criarEstagios = function() {
                 var proxFase = true;
 
                 for(var i = 0;  i < this.pcs.length; i++){
-                    if(this.pcs[i].vidas <= 5 && this.survivor == 0){
+                    if(this.pcs[i].vidas <= 4 && this.survivor == 0){
                         proxFase = false;
                     }
                 }
@@ -190,10 +190,13 @@ GameManager.prototype.criarEstagios = function() {
                         if(this.pcs[i].vidas<7){this.pcs[i].vidas++;}
                 }
                 for(var i = 0; i < this.spritesE.length; i++){
-                    console.log("entrou no loop de destruicao");
                     this.assets.play("explosion");
                     this.adicionar(new Animation({x: this.spritesE[i].x, y:this.spritesE[i].y, imagem: "explosion"}));
                     this.toRemove.push(this.spritesE[i]);
+                }
+                for(var i = 0; i < this.spritesTE.length; i++){
+                    this.assets.play("explosion");
+                    this.adicionar(new Animation({x: this.spritesTE[i].x, y:this.spritesTE[i].y, imagem: "explosion"}));
                     this.toRemove.push(this.spritesTE[i]);
                 }
                 this.stageIndex++;

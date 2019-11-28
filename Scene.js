@@ -29,6 +29,7 @@ function Scene(params) {
         stageIndex: 0,
         tipoB1: "botao1",
         tipoB2: "botao2",
+        tipoB3: "survivorbotao",
         multiplier: 1,
         eventIndex: 0,
         eventoCorrente: undefined
@@ -308,16 +309,10 @@ Scene.prototype.navigationBar = function(t){
         ctx.font = "10px Arial";
         ctx.fillText("Seu universo corre perigo! Invasores de outra galáxia pretendem conquistar tudo e todos.",20,this.h-76);
         ctx.fillText("Defenda o o universo com uma nave poderosa!",20,this.h-56);
-        ctx.fillText("Controles P1 - Direcionais: WASD / Tiro: J / Turbo: K / Mudar tipo de tiro: L ::: Controles P2"+ 
-        "- Direcionais: Numpad da direita 8546 / Tiro: + / Turbo: Enter / Mudar tipo de tiro:  .",20,this.h-36);
-        ctx.fillText("Aperte T para entrar ou sair do modo Survivor.",20,this.h-16);
+        ctx.fillText("Controles P1 - Direcionais: WASD / Tiro: J / Turbo: K / Mudar tipo de tiro: L",20,this.h-36);
+        ctx.fillText("Controles P2 - Direcionais: Numpad da direita 8546 / Tiro: + / Turbo: Enter / Mudar tipo de tiro:  .",20,this.h-16);
         ctx.font = "30px Eurostile";
         ctx.fillText("Flew Far Faster",333,this.h-645);
-        if(this.survivor == 1){
-            ctx.font = "20px Eurostile";
-            ctx.fillStyle = "lightblue";
-            ctx.fillText("Survivor",235,this.h-625);       
-        }
         //teste
         function Botao(x,y,w,h){
            this.x = x;
@@ -328,6 +323,7 @@ Scene.prototype.navigationBar = function(t){
 
         var bt = new Botao(40,20,110,50);
         var bt2 = new Botao(this.w - 150,20,110,50);
+        var bt3 = new Botao(this.w - 150,this.h-75,110,50);
         
         canvas.onmousemove = function(evt){
             var rectNav = canvas.getBoundingClientRect();
@@ -336,11 +332,11 @@ Scene.prototype.navigationBar = function(t){
                 y: evt.clientY - rectNav.top
              };
             if((pos.x> bt.x && pos.x < (bt.x+bt.w) && pos.y>bt.y && pos.y<(bt.y+bt.h)) ||
-                (pos.x> bt2.x && pos.x < (bt2.x+bt2.w) && pos.y>bt2.y && pos.y<(bt2.y+bt2.h))){
+                (pos.x> bt2.x && pos.x < (bt2.x+bt2.w) && pos.y>bt2.y && pos.y<(bt2.y+bt2.h)) || 
+                (pos.x> bt3.x && pos.x < (bt3.x+bt3.w) && pos.y>bt3.y && pos.y<(bt3.y+bt3.h))){
                 canvas.style.cursor = "pointer";
-                cena1.tipoB1 = "botao1hover";
-                cena1.tipoB2 = "botao2hover";
-
+                if((pos.x> bt.x && pos.x < (bt.x+bt.w) && pos.y>bt.y && pos.y<(bt.y+bt.h))) {cena1.tipoB1 = "botao1hover";}
+                if((pos.x> bt2.x && pos.x < (bt2.x+bt2.w) && pos.y>bt2.y && pos.y<(bt2.y+bt2.h))) {cena1.tipoB2 = "botao2hover";}
             }
             else{
                 canvas.style.cursor = "auto";
@@ -350,6 +346,7 @@ Scene.prototype.navigationBar = function(t){
         }
         ctx.drawImage(this.assets.img(this.tipoB1),bt.x,bt.y,bt.w,bt.h);    
         ctx.drawImage(this.assets.img(this.tipoB2),bt2.x,bt2.y,bt2.w,bt2.h); 
+        ctx.drawImage(this.assets.img(this.tipoB3),bt3.x,bt3.y,bt3.w,bt3.h); 
 
         canvas.onclick = function(evt){
             var rectNav = canvas.getBoundingClientRect();
@@ -366,6 +363,21 @@ Scene.prototype.navigationBar = function(t){
                 cena1.gameStart = 1;
                 adicionarListeners();
                 cena1.multiplier = 1.5;
+            }
+            if(pos.x> bt3.x && pos.x < (bt3.x+bt3.w) && pos.y>bt3.y && pos.y<(bt3.y+bt3.h)){
+                if(cena1.survivor == 0){
+                    cena1.tipoB3 = "survivorbotaohover";
+                    cena1.survivor = 1;
+                    for(var i = 0; i < cena1.pcs.length; i++){
+                        cena1.pcs[i].vidas = 1;
+                    }
+                } else {
+                    cena1.tipoB3 = "survivorbotao";
+                    cena1.survivor = 0;
+                    for(var i = 0; i < cena1.pcs.length; i++){
+                        cena1.pcs[i].vidas = 7;
+                    }
+                }
             }
         }
 

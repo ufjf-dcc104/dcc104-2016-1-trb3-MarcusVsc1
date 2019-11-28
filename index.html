@@ -30,6 +30,8 @@
         var assetsMng = new AssetsManager();
         assetsMng.loadImage("botao1","assets/botao1.png");
         assetsMng.loadImage("botao2","assets/botao2.png");
+        assetsMng.loadImage("survivorbotao","assets/survivorbotao.png");
+        assetsMng.loadImage("survivorbotaohover","assets/survivorbotaohover.png");
         assetsMng.loadImage("botao1hover","assets/botao1hover.png");
         assetsMng.loadImage("botao2hover","assets/botao2hover.png");
         assetsMng.loadImage("player","assets/player_ship2.png");
@@ -46,6 +48,7 @@
         assetsMng.loadImage("enemy_10","assets/enemy_10.png");
         assetsMng.loadImage("shot","assets/cannonball.png");
         assetsMng.loadImage("shot2","assets/cannonball2.png");
+        assetsMng.loadImage("shot5","assets/shot5.png");
         assetsMng.loadImage("missil","assets/missil.png");
         assetsMng.loadImage("yoyo","assets/yoyo.png");
         assetsMng.loadImage("shot3","assets/shot3.png");
@@ -65,6 +68,7 @@
         assetsMng.loadAudio("shot5","assets/shot5.mp3");
         assetsMng.loadAudio("turbo","assets/turbo.ogg");
         assetsMng.loadAudio("item","assets/item.ogg");
+        assetsMng.loadAudio("buzzer","assets/buzzer.ogg");
         assetsMng.loadAudio("paralyze","assets/paralyze.ogg");
 
         console.log(assetsMng);
@@ -99,7 +103,6 @@
         function desenhaNPC(){
             ctx.save();
             ctx.translate(this.x, this.y);
-            ctx.strokeRect(-this.w/2, -this.h/2, this.w, this.h);
             if(this.maxVidas > 1){
                 ctx.fillStyle = "white";
                 ctx.fillRect(-this.w/2,-this.h/2 - 12,this.lifebar,5);
@@ -213,8 +216,6 @@
             }
         }
 
-
-
         //funcao de comportamento do inimigo chefe, nao muito diferente da paraAtira no geral. foi imaginado algo mais complexo, mas foi preferivel deixar apenas 
         function chefe(alvo) {
            return function(){
@@ -231,7 +232,7 @@
               (dy/da)*Math.sin(this.a +adj);
 
               this.va = 2*(prod-0);
-              this.props.spawn -= 1/80;
+              this.props.spawn -= 1/65;
               if(this.props.spawn <= 0){
                 this.props.spawn = 2;
                 var novo = new Sprite({
@@ -262,7 +263,7 @@
             }
         }
 
-        //comportamento final do chefe
+        //comportamento final do chefe, faz spawn com um inimigo de 3 vidas
         function comportamentoFinal(alvo){
               return function(){
                   if(alvo.vidas == 0){
@@ -281,8 +282,7 @@
                     this.props.spawn = 2.75;
                     var novo = new Sprite({
                     x: this.x, y: this.y, w:30, h: 30, vm: 70*Math.random()+50, comportar: persegue(alvo), drop: 1, maxVidas: 3,
-                    vidas: 3, 
-                    imagem: "enemy_8", props:{tipo:"npc"}
+                    vidas: 3, imagem: "enemy_8", props:{tipo:"npc"}
                });
                     this.scene.adicionar(novo);
                   }
@@ -348,7 +348,7 @@
 
         }
 
-        //funcao de comportamento inimigo, faz o inimigo atirar
+        //funcao de comportamento inimigo, faz o inimigo lançar misseis 
         function lancaMisseis(alvo) {
            return function(){
               if(alvo.vidas == 0){
@@ -373,16 +373,13 @@
             }
         }
 
+        //função de comportamento do míssil, teleguiados que se destroem depois de algum tempo
         function missil(alvo) {
           return function(){
             if(alvo == undefined || alvo == null || alvo.vidas == 0){
-                if(this.scene.pcs.length > 0 && this.props.tipo == "tiroE"){alvo = this.scene.pcs[0];
-                }
-                else{
-                  this.scene.toRemove.push(this);
-                  this.scene.assets.play("explosion");
-                  this.scene.adicionar(new Animation({x: this.x, y:this.y, imagem: "explosion"}));
-                }
+                this.scene.toRemove.push(this);
+                this.scene.assets.play("explosion");
+                this.scene.adicionar(new Animation({x: this.x, y:this.y, imagem: "explosion"}));
             }
             var dx = alvo.x - this.x;
             var dy = alvo.y - this.y;
@@ -402,6 +399,7 @@
           }
         }
 
+        //função de comportamento inimigo, lança um yoyo
         function lancaYoYo(alvo) {
            return function(){
               if(alvo.vidas == 0){
@@ -426,6 +424,7 @@
             }
         }
 
+        //função de comportamento do yoyo, fica para um tempo e depois retorna a quem o jogou
         function yoyo() {
            return function(){
               //this.a+= 0.1;
@@ -446,6 +445,7 @@
             }
         }
 
+        //função de retorno do yoyo
         function retorno(){
           return function(){
             var dx = this.lancador.x - this.x;
@@ -495,16 +495,12 @@
                 if(this.teclas.cima === this.teclas.turbo && this.teclas.cima && this.turbo >= 0) { 
                   this.vm = +450;
                   this.turbo = this.turbo - 0.05;
-
                 }
-
-                if(this.teclas.cima === this.teclas.turbo && this.teclas.cima && this.turbo < 0) { this.teclas.turbo = 0; }              
+                if(this.teclas.cima === this.teclas.turbo && this.teclas.cima && this.turbo < 0) { this.teclas.turbo = 0; }     
                 if(this.teclas.turbo == 0 && this.turbo < 5){ this.turbo = this.turbo + 0.03;}
-                  
 
                 if(this.teclas.espaco && this.cooldown <=0) { 
                   var tiro;
-                  
                   switch(this.modeloTiro[this.tiroCorrente]){
                       case 0:
                         this.cooldown = 0.05;
@@ -547,14 +543,7 @@
                         assetsMng.play("shot4");
                         tiro = new Sprite({
                         x: this.x, y: this.y, a: this.a, vm:360, jogador: this,
-                        color: "black", w:16, h: 16, desenhar:function(ctx){
-                          ctx.globalAlpha = 0.5;
-                          ctx.fillStyle = this.color;
-                          ctx.fillRect(this.x, this.y, this.w, this.h);
-                          ctx.strokeStyle = "black";
-                          ctx.strokeRect(this.x, this.y, this.w, this.h);
-                          ctx.globalAlpha = 1;
-                        }, props:{tipo:"tiro", atravessa:1}
+                        color: "black", w:16, h: 16, imagem: "shot5", props:{tipo:"tiro", atravessa:1}
                         })
                         this.scene.adicionar(tiro);
                         this.cooldown = 1.5;
@@ -568,8 +557,10 @@
                           w:12, h: 15, props:{tipo:"tiro", atravessa:0}
                           })
                           this.scene.adicionar(tiro);
-                          this.cooldown = 0.75;
+                          this.cooldown = 0.50;
                           assetsMng.play("shot5"); 
+                        } else {
+                          assetsMng.play("buzzer"); 
                         }
                         break;
 
@@ -581,9 +572,6 @@
 
         //funcao para trocar o tipo de tiro atual
         function trocaTipoTiro(pec){
-
-          //if(teclas.tipoTiro == 0) {teclas.tipoTiro = 1}
-          //else{teclas.tipoTiro = 0}
           pec.tiroCorrente++;
           if(pec.tiroCorrente == pec.modeloTiro.length){
             pec.tiroCorrente = 0;
@@ -600,7 +588,7 @@
               cena1.survivor = 0;
               pc.vidas = 7;
               pc2.vidas = 7;
-            }
+              }
             }
             
         }
@@ -608,10 +596,7 @@
 
           //Configura controles
           addEventListener("keydown", function (e) {
-              switch (e.keyCode) { 
-                  case 84:
-                      entraModoSurvivor();
-                      break;               
+              switch (e.keyCode) {               
                   case 65:
                       pc.teclas.esquerda = 1;
                       break;
