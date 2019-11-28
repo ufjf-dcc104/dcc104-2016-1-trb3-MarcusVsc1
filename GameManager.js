@@ -236,6 +236,7 @@ GameManager.prototype.criarEstagios = function() {
     eventoLista = [];
     bg = "bg5";
 
+    //parte inicial da fase 5, com inimigos aparecendo enquanto o chefe atira
     evento = function(){
         return function(t){
             //vitoria
@@ -267,9 +268,9 @@ GameManager.prototype.criarEstagios = function() {
     }
     eventoLista.push(evento);
 
+    //especial do chefe
     evento = function(){
         return function(){
-            //especial do chefe
             for(var i = 0; i < this.spritesE.length;i++){
                 if(this.spritesE[i].props.chefe != undefined){
                     this.spritesE[i].vm = 0;
@@ -281,6 +282,7 @@ GameManager.prototype.criarEstagios = function() {
     }
     eventoLista.push(evento);
 
+    //parte final da fase 5
     evento = function(){
         return function(){
             //derrota

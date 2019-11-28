@@ -139,7 +139,7 @@
                 comportar: lancaPlataforma(pec)});
               break;
             case 5:
-              sprite = new Sprite({x: (cena1.w/2) - 30, y:0, vm: 15*Math.random() + 15, h: 60, w:60, imagem: "enemy_9", vidas: Math.ceil(335*cena1.multiplier), maxVidas: Math.ceil(335*cena1.multiplier), lifebar: 50, pontuacao: 3000, desenhar: desenhaNPC, props:{tipo:"npc", spawn: 0, spawn2: 0, chefe: 1}, comportar: chefe(pec)});
+              sprite = new Sprite({x: (cena1.w/2) - 30, y:0, vm: 15*Math.random() + 15, h: 60, w:60, imagem: "enemy_9", vidas: Math.ceil(360*cena1.multiplier), maxVidas: Math.ceil(360*cena1.multiplier), lifebar: 50, pontuacao: 3000, desenhar: desenhaNPC, props:{tipo:"npc", spawn: 0, spawn2: 0, chefe: 1}, comportar: chefe(pec)});
               break;
             case 6:
               sprite = new Sprite({x: cena1.w*Math.random(),y:0, vm: 30*Math.random() + 40, h: 40, w:40,  imagem: "enemy_5", vidas: Math.ceil(12*cena1.multiplier), maxVidas: Math.ceil(12*cena1.multiplier), powerUp:4, pontuacao: 320, desenhar: desenhaNPC, props:{tipo:"npc", spawn: 2}, 
@@ -279,7 +279,7 @@
                   this.va = 2*(prod-0);
                   this.props.spawn -= 1/60;
                   if(this.props.spawn <= 0){
-                    this.props.spawn = 2.75;
+                    this.props.spawn = 2.5;
                     var novo = new Sprite({
                     x: this.x, y: this.y, w:30, h: 30, vm: 70*Math.random()+50, comportar: persegue(alvo), drop: 1, maxVidas: 3,
                     vidas: 3, imagem: "enemy_8", props:{tipo:"npc"}
