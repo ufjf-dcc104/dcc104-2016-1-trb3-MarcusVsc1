@@ -256,7 +256,7 @@ GameManager.prototype.criarEstagios = function() {
             }
             if(this.respawner<=0){
                 this.newEnemy(Math.floor(Math.random()*3 + 1),this.pcs[Math.floor(Math.random()*this.pcs.length)]);
-                this.respawner = 8;
+                this.respawner = 8/this.multiplier;
             }
             else{
                 this.respawner -= 1/60;
