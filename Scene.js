@@ -506,8 +506,8 @@ Scene.prototype.navigationBar = function(t){
                 ctx.fillText("Os inimigos foram derrotados e o universo está a salvo.",20,this.h-70);
                 ctx.fillText("Tempo: "+this.tempoFinal+"  Pontuação P1: "+pc.pontuacao+
                     "  Pontuação P2: "+pc2.pontuacao,20,this.h-50);
-                ctx.fillText("Jogo feito por Marcus Vinícius V. A. Cunha",395,this.h-50);
                 ctx.fillText("Aperte F5 caso queira reiniciar o jogo.",20,this.h-30);
+                ctx.fillText("Jogo feito por Marcus Vinícius V. A. Cunha",395,this.h-50);
                 ctx.fillText("Matrícula 201776013 marcus.vasconcelos@ice.ufjf.br",345,this.h-30);
                 ctx.font = "30px Eurostile";
                 ctx.fillText("Você venceu o combate!",60,this.h-645);
@@ -523,8 +523,8 @@ Scene.prototype.navigationBar = function(t){
                 ctx.fillText("Os inimigos se saíram vitoriosos e irão escravizar a galáxia.",20,this.h-70);
                 ctx.fillText("Tempo: "+this.tempoFinal+"  Pontuação P1: "+pc.pontuacao+
                     "  Pontuação P2: "+pc2.pontuacao,20,this.h-50);
-                ctx.fillText("Jogo feito por Marcus Vinícius V. A. Cunha",395,this.h-50);
                 ctx.fillText("Aperte F5 caso queira reiniciar o jogo.",20,this.h-30);
+                ctx.fillText("Jogo feito por Marcus Vinícius V. A. Cunha",395,this.h-50);
                 ctx.fillText("Matrícula 201776013 marcus.vasconcelos@ice.ufjf.br",345,this.h-30);
                 ctx.font = "30px Eurostile";
                 ctx.fillText("Você perdeu!",20,this.h-645);
@@ -544,6 +544,8 @@ Scene.prototype.tocarMusica = function(tema){
 //funcao que finaliza o jogo, independentemente de ganhar ou perder
 Scene.prototype.finalizarGame = function(tema){
     this.estagio.eventos = [];
+    this.spritesT = [];
+    this.spritesTE = [];
     this.musica.src = tema;
     this.musica.loop = true;
     this.musica.play();

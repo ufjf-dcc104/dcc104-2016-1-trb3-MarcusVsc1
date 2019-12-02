@@ -209,7 +209,7 @@ GameManager.prototype.criarEstagios = function() {
                 this.tempoTotal = t - this.startPoint;
                 this.startPoint=t;
                 this.newEnemy(5,this.pcs[Math.floor(Math.random()*this.pcs.length)]);
-                this.respawner = 20;
+                this.respawner = 2;
             }
             if(((this.respawner <= 0) || (this.spritesE.length == 0 && this.countRespawn < 4))){
                 if(this.countRespawn%2!=0){

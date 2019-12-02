@@ -15,6 +15,7 @@
     <script src="AssetsManager.js"></script>
     <script src="GameManager.js"></script>
     <script src="Animation.js"></script>
+    <script src="InputController.js"></script>
 </head>
 <body>
 
@@ -26,6 +27,20 @@
         canvas.height = 700;
         
         var ctx = canvas.getContext("2d");
+
+        var input = new InputController();
+        input.setupKeyboard([
+            {nome: "espaco", codigo: 32},
+            {nome: "esquerda", codigo: 37},
+            {nome: "cima", codigo: 38},
+            {nome: "direita", codigo: 39},
+            {nome: "baixo", codigo: 40},
+            {nome: "a", codigo: 65},
+            {nome: "w", codigo: 87},
+            {nome: "d", codigo: 68},
+            {nome: "s", codigo: 83},
+        ]);
+        input.setupJoysticks();
 
         var assetsMng = new AssetsManager();
         assetsMng.loadImage("botao1","assets/botao1.png");
@@ -245,7 +260,7 @@
         //especial do chefe
         function especialDoChefe(){
             return function(){
-              this.va = +0.2;
+              this.va = +0.3;
               this.props.spawn -= 1;
               if(this.props.spawn <= 0){
                   this.props.spawn = 2;
@@ -345,7 +360,6 @@
                 this.scene.adicionar(novo);
               }
             }
-
         }
 
         //funcao de comportamento inimigo, faz o inimigo lançar misseis 
@@ -467,13 +481,12 @@
           }
         }
 
-
-
         //funcao de contagem de tempo e movimentacao do jogo
         function passo(t) {
             dt = (t-anterior)/1000;
             cena1.passo(t,dt);
-            anterior = t;            
+            anterior = t;     
+            input.updateJoysticks();    
             requestAnimationFrame(passo);
         }
 
@@ -533,7 +546,7 @@
                       case 2:
                         tiro = new Sprite({
                         x: this.x, y: this.y, a: this.a, jogador: this,
-                        vm:Math.cos(dt/1000)*100, imagem: "shot3", w:6, h: 6, props:{tipo:"tiro", atravessa:0}
+                        vm:Math.cos(dt/1000)*105, imagem: "shot3", w:6, h: 6, props:{tipo:"tiro", atravessa:0}
                         })
                         this.scene.adicionar(tiro);
                         this.cooldown = 0.15;
@@ -578,20 +591,6 @@
           }
         }
 
-        function entraModoSurvivor(){
-            if(cena1.survivor == 0 && cena1.gameStart == 0){
-              cena1.survivor = 1;
-              pc.vidas = 1;
-              pc2.vidas = 1;
-            } else{
-              if(cena1.survivor == 1 && cena1.gameStart == 0){
-              cena1.survivor = 0;
-              pc.vidas = 7;
-              pc2.vidas = 7;
-              }
-            }
-            
-        }
         function adicionarListeners() {        
 
           //Configura controles
