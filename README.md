@@ -6,8 +6,9 @@ Alterações com relação à primeira versão:
 2) Adicionados efeito de explosão para personagens e tiros, quando aplicável
 3) Adicionados efeitos sonoros
 4) Adicionada possibilidade de jogo com dois jogadores
-5) Adicionado controle por joystick (porém, movimentação se dá apenas por teclado ou joystick, nunca ambos juntos)
+5) Adicionado controle por joystick (porém, movimentação se dá apenas por teclado ou joystick, nunca os dois juntos)
 6) Balanceamento geral do jogo
+7) Fase extra ao passar pela fase 3 com ao menos 4 vidas, com inimigos que dropam um poder novo
 
 
 Mudanças de código:
