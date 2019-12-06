@@ -30,17 +30,49 @@
 
         var input = new InputController();
         input.setupKeyboard([
-            {nome: "espaco", codigo: 32},
-            {nome: "esquerda", codigo: 37},
-            {nome: "cima", codigo: 38},
-            {nome: "direita", codigo: 39},
-            {nome: "baixo", codigo: 40},
+            {nome: "tiroP1", codigo: 74},
+            {nome: "turboP1", codigo: 75},
+            {nome: "trocaP1", codigo: 76},
             {nome: "a", codigo: 65},
             {nome: "w", codigo: 87},
             {nome: "d", codigo: 68},
             {nome: "s", codigo: 83},
+            {nome: "8", codigo: 104},
+            {nome: "5", codigo: 101},
+            {nome: "4", codigo: 100},
+            {nome: "6", codigo: 102},
+            {nome: "tiroP2", codigo: 107},
+            {nome: "turboP2", codigo: 13},
+            {nome: "trocaP2", codigo: 46},
         ]);
         input.setupJoysticks();
+
+        input.setupComandos([
+         {comando: "tiroP1", tecla: "tiroP1", joystick: 0, botao: 3},
+         {comando: "trocaP1", tecla: "trocaP1", joystick: 0, botao: 1},
+         {comando: "turboP1", tecla: "turboP1", joystick: 0, botao: 2},
+         {comando: "tiroP2", tecla: "tiroP2", joystick: 1, botao: 3},
+         {comando: "turboP2", tecla: "turboP2", joystick: 1, botao: 2},
+         {comando: "trocaP2", tecla: "trocaP2", joystick: 1, botao: 1},
+         {comando: "cimaP1", tecla: "w", joystick: 0, botao: 15},
+         {comando: "baixoP1", tecla: "s", joystick: 0, botao: 15},
+         {comando: "esquerdaP1", tecla: "a", joystick: 0, botao: 15},
+         {comando: "direitaP1", tecla: "d", joystick: 0, botao: 15},
+         {comando: "cimaP2", tecla: "8", joystick: 1, botao: 15},
+         {comando: "baixoP2", tecla: "5", joystick: 1, botao: 15},
+         {comando: "esquerdaP2", tecla: "4", joystick: 1, botao: 15},
+         {comando: "direitaP2", tecla: "6", joystick: 1, botao: 15},
+
+        ]);
+
+        input.setupMovimentos([
+           { movimento: "horizontalP1", negativo: "a", positivo: "d", joystick: 0, eixo: 0 },
+           { movimento: "verticalP1", negativo: "s", positivo: "w", joystick: 0, eixo: 1 },
+           { movimento: "horizontalP2", negativo: "4", positivo: "6", joystick: 1, eixo: 0 },
+           { movimento: "verticalP2", negativo: "5", positivo: "8", joystick: 1, eixo: 1 },
+        ]);
+
+
 
         var assetsMng = new AssetsManager();
         assetsMng.loadImage("botao1","assets/botao1.png");
@@ -97,11 +129,11 @@
         //variaveis de inicio de game
         var cena1 = new Scene({ctx: ctx, w: canvas.width, h: canvas.height, gameStart: 0, survivor: 0, newEnemy: criarInimigo, criarPoder: criarPowerUp, assets: assetsMng, gamer: gerenciador});
 
-        var pc = new Sprite({comportar: porTeclasDirecionais(), w: 32, h:32, turbo: 5, vidas: 7, x:317.3, y: 500, imagem: "player", props:{tipo:"pc"}});
+        var pc = new Sprite({comportar: porTeclasDirecionais(), w: 32, h:32, turbo: 5, vidas: 7, x:317.3, y: 500, imagem: "player", playerNumber: 1, props:{tipo:"pc"}});
         pc.modeloTiro.push(0);
         cena1.adicionar(pc);
 
-        var pc2 = new Sprite({comportar: porTeclasDirecionais(), w: 32, h:32, turbo: 5, vidas: 7, x:650.3, y: 500, imagem: "player2", props:{tipo:"pc"}});
+        var pc2 = new Sprite({comportar: porTeclasDirecionais(), w: 32, h:32, turbo: 5, vidas: 7, x:650.3, y: 500, imagem: "player2", playerNumber: 2, props:{tipo:"pc"}});
         pc2.modeloTiro.push(0);
         cena1.adicionar(pc2);
 
@@ -486,7 +518,7 @@
             dt = (t-anterior)/1000;
             cena1.passo(t,dt);
             anterior = t;     
-            input.updateJoysticks();    
+            input.update(); 
             requestAnimationFrame(passo);
         }
 
@@ -497,196 +529,106 @@
         //funcao de comportamento do usuario
         function porTeclasDirecionais(){
             return function() {
-                if(this.teclas.esquerda) { this.va = -3.5 }
-                if(this.teclas.direita) { this.va = +3.5 }
-                if(this.teclas.esquerda === this.teclas.direita) { this.va = 0}
-
-                if(this.teclas.cima && !this.teclas.turbo) { this.vm = +220 }
-                if(this.teclas.baixo) { this.vm = -120 }
-                if(this.teclas.cima === this.teclas.baixo) { this.vm = 0 }
-                
-                if(this.teclas.cima === this.teclas.turbo && this.teclas.cima && this.turbo >= 0) { 
-                  this.vm = +450;
-                  this.turbo = this.turbo - 0.05;
+              var joy = input.joysticks[this.playerNumber-1];
+              
+              if(!joy || !joy.connected){input.movimentos["verticalP"+this.playerNumber].valor*= -1}
+              if(input.comandos["turboP"+this.playerNumber].valor){
+                if(this.turbo >= 5 && input.movimentos["verticalP"+this.playerNumber].valor == -1){
+                  this.turboTrigger = 1; 
+                  assetsMng.play("turbo");
                 }
-                if(this.teclas.cima === this.teclas.turbo && this.teclas.cima && this.turbo < 0) { this.teclas.turbo = 0; }     
-                if(this.teclas.turbo == 0 && this.turbo < 5){ this.turbo = this.turbo + 0.03;}
+              }
+              this.va = +3.5*input.movimentos["horizontalP"+this.playerNumber].valor;
+              var multi = 0;
+              if(input.movimentos["verticalP"+this.playerNumber].valor == 1) {multi = -120} 
+              if(input.movimentos["verticalP"+this.playerNumber].valor == -1 && 
+                this.turboTrigger == 0) {multi = -220}
 
-                if(this.teclas.espaco && this.cooldown <=0) { 
-                  var tiro;
-                  switch(this.modeloTiro[this.tiroCorrente]){
-                      case 0:
-                        this.cooldown = 0.05;
-                        tiro = new Sprite({
-                        x: this.x, y: this.y, a: this.a-0.1+0.2*Math.random(), imagem: "shot", jogador: this,
-                        vm:240, w:6, h: 6, props:{tipo:"tiro", atravessa:0}
-                        })
-                        assetsMng.play("shot");
-                        this.cooldown = 0.5;
-                        break;
-                      case 1:
-                        assetsMng.play("shot2");
-                        tiro = new Sprite({
-                        x: this.x, y: this.y, a: this.a-0.1, jogador: this,
-                        vm:240, color: "pink", w:6, h: 6, imagem: "shot2", props:{tipo:"tiro", atravessa:0}
-                        })
-                        this.scene.adicionar(tiro); 
+              if(this.turboTrigger == 1 && input.movimentos["verticalP"+this.playerNumber].valor == -1 && this.turbo >= 0){
+                multi = -450;
+                this.turbo = this.turbo - 0.05;
+              }
+              this.vm = input.movimentos["verticalP"+this.playerNumber].valor * multi;
+              this.vm = input.movimentos["verticalP"+this.playerNumber].valor * multi;
+              
+              if(this.turbo <= 0 || !input.comandos["turboP"+this.playerNumber].valor){this.turboTrigger = 0}
+              if(this.turboTrigger == 0 && this.turbo <= 5){this.turbo = this.turbo + 0.03}
 
+              if(input.comandos["trocaP"+this.playerNumber].valor && this.changeCD <= 0){
+                this.tiroCorrente++;
+                this.changeCD = 2;
+              }
+              this.changeCD-= 0.2;
+
+              if(input.comandos["tiroP"+this.playerNumber].valor && this.cooldown <=0) { 
+                var tiro;
+                switch(this.modeloTiro[this.tiroCorrente%this.modeloTiro.length]){
+                    case 0:
+                      this.cooldown = 0.05;
+                      tiro = new Sprite({
+                      x: this.x, y: this.y, a: this.a-0.1+0.2*Math.random(), imagem: "shot", jogador: this,
+                      vm:240, w:6, h: 6, props:{tipo:"tiro", atravessa:0}
+                      })
+                      assetsMng.play("shot");
+                      this.cooldown = 0.5;
+                      break;
+                    case 1:
+                      assetsMng.play("shot2");
+                      tiro = new Sprite({
+                      x: this.x, y: this.y, a: this.a-0.1, jogador: this,
+                      vm:240, color: "pink", w:6, h: 6, imagem: "shot2", props:{tipo:"tiro", atravessa:0}
+                      })
+                      this.scene.adicionar(tiro); 
+
+                      tiro = new Sprite({
+                      x: this.x, y: this.y, a: this.a, jogador: this,
+                      vm:240, color: "pink", w:6, h: 6, imagem: "shot2", props:{tipo:"tiro", atravessa:0}
+                      })
+                      this.scene.adicionar(tiro);
+                      tiro = new Sprite({
+                      x: this.x, y: this.y, a: this.a+0.1, jogador: this,
+                      vm:240, color: "pink", w:6, h: 6, imagem: "shot2", props:{tipo:"tiro", atravessa:0}
+                      })
+                      this.cooldown = 0.7;
+                      break;
+                    case 2:
+                      tiro = new Sprite({
+                      x: this.x, y: this.y, a: this.a, jogador: this,
+                      vm:Math.cos(dt/1000)*105, imagem: "shot3", w:6, h: 6, props:{tipo:"tiro", atravessa:0}
+                      })
+                      this.scene.adicionar(tiro);
+                      this.cooldown = 0.15;
+                      assetsMng.play("shot3");
+                      break;
+                    case 3:
+                      assetsMng.play("shot4");
+                      tiro = new Sprite({
+                      x: this.x, y: this.y, a: this.a, vm:360, jogador: this,
+                      color: "black", w:16, h: 16, imagem: "shot5", props:{tipo:"tiro", atravessa:1}
+                      })
+                      this.scene.adicionar(tiro);
+                      this.cooldown = 1.5;
+                      break;
+                    case 4:
+                      if(this.scene.spritesE.length > 0){
+                        var posicao = Math.floor( Math.random()*this.scene.spritesE.length);
                         tiro = new Sprite({
-                        x: this.x, y: this.y, a: this.a, jogador: this,
-                        vm:240, color: "pink", w:6, h: 6, imagem: "shot2", props:{tipo:"tiro", atravessa:0}
+                        x: this.x, y: this.y, a: this.a, jogador: this, frame: 0,
+                        vm:30, imagem: "missil", comportar: missil(this.scene.spritesE[posicao]),
+                        w:12, h: 15, props:{tipo:"tiro", atravessa:0}
                         })
                         this.scene.adicionar(tiro);
-                        tiro = new Sprite({
-                        x: this.x, y: this.y, a: this.a+0.1, jogador: this,
-                        vm:240, color: "pink", w:6, h: 6, imagem: "shot2", props:{tipo:"tiro", atravessa:0}
-                        })
-                        this.cooldown = 0.7;
-                        break;
-                      case 2:
-                        tiro = new Sprite({
-                        x: this.x, y: this.y, a: this.a, jogador: this,
-                        vm:Math.cos(dt/1000)*105, imagem: "shot3", w:6, h: 6, props:{tipo:"tiro", atravessa:0}
-                        })
-                        this.scene.adicionar(tiro);
-                        this.cooldown = 0.15;
-                        assetsMng.play("shot3");
-                        break;
-                      case 3:
-                        assetsMng.play("shot4");
-                        tiro = new Sprite({
-                        x: this.x, y: this.y, a: this.a, vm:360, jogador: this,
-                        color: "black", w:16, h: 16, imagem: "shot5", props:{tipo:"tiro", atravessa:1}
-                        })
-                        this.scene.adicionar(tiro);
-                        this.cooldown = 1.5;
-                        break;
-                      case 4:
-                        if(this.scene.spritesE.length > 0){
-                          var posicao = Math.floor( Math.random()*this.scene.spritesE.length);
-                          tiro = new Sprite({
-                          x: this.x, y: this.y, a: this.a, jogador: this, frame: 0,
-                          vm:30, imagem: "missil", comportar: missil(this.scene.spritesE[posicao]),
-                          w:12, h: 15, props:{tipo:"tiro", atravessa:0}
-                          })
-                          this.scene.adicionar(tiro);
-                          this.cooldown = 0.50;
-                          assetsMng.play("shot5"); 
-                        } else {
-                          assetsMng.play("buzzer"); 
-                        }
-                        break;
-
-                  }
-                  this.scene.adicionar(tiro); 
-                };
+                        this.cooldown = 0.50;
+                        assetsMng.play("shot5"); 
+                      } else {
+                        assetsMng.play("buzzer"); 
+                      }
+                      break;
+                }
+                this.scene.adicionar(tiro); 
+              };
             }
-        }
-
-        //funcao para trocar o tipo de tiro atual
-        function trocaTipoTiro(pec){
-          pec.tiroCorrente++;
-          if(pec.tiroCorrente == pec.modeloTiro.length){
-            pec.tiroCorrente = 0;
-          }
-        }
-
-        function adicionarListeners() {        
-
-          //Configura controles
-          addEventListener("keydown", function (e) {
-              switch (e.keyCode) {               
-                  case 65:
-                      pc.teclas.esquerda = 1;
-                      break;
-                  case 100:
-                      pc2.teclas.esquerda = 1;
-                      break;
-                  case 87:
-                      pc.teclas.cima = 1;
-                      break;
-                  case 104:
-                      pc2.teclas.cima = 1;
-                      break;
-                  case 68:
-                      pc.teclas.direita = 1;
-                      break;
-                  case 102:
-                      pc2.teclas.direita = 1;
-                      break;
-                  case 83:
-                      pc.teclas.baixo = 1;
-                      break;
-                  case 101:
-                      pc2.teclas.baixo = 1;
-                      break;
-                  case 74:
-                      pc.teclas.espaco = 1;
-                      break;
-                  case 107:
-                      pc2.teclas.espaco = 1;
-                      break;
-                  case 75:
-                      if(pc.turbo >= 5){pc.teclas.turbo = 1; 
-                        if(pc.teclas.cima)assetsMng.play("turbo");};
-                  	  break;
-                  case 13:
-                      if(pc2.turbo >= 5){pc2.teclas.turbo = 1; 
-                        if(pc2.teclas.cima)assetsMng.play("turbo");};
-                      break;
-                   case 76:              
-                      trocaTipoTiro(pc);
-                      break;
-                   case 110:              
-                      trocaTipoTiro(pc2);
-                      break; 
-                  default:
-                      break;
-              }
-          });
-          addEventListener("keyup", function (e) {
-              switch (e.keyCode) {
-                  case 65:
-                      pc.teclas.esquerda = 0;
-                      break;
-                  case 87:
-                      pc.teclas.cima = 0;
-                      break;
-                  case 68:
-                      pc.teclas.direita = 0;
-                      break;
-                  case 83:
-                      pc.teclas.baixo = 0;
-                      break;
-                  case 74:
-                      pc.teclas.espaco = 0;
-                  	break;
-                  case 75:
-                      pc.teclas.turbo = 0;
-                    	break;
-                  case 100:
-                      pc2.teclas.esquerda = 0;
-                      break;
-                  case 104:
-                      pc2.teclas.cima = 0;
-                      break;
-                  case 102:
-                      pc2.teclas.direita = 0;
-                      break;
-                  case 101:
-                      pc2.teclas.baixo = 0;
-                      break;
-                  case 107:
-                      pc2.teclas.espaco = 0;
-                      break;
-                  case 13:
-                      pc2.teclas.turbo = 0;
-                      break;
-                  default:
-                      break;
-              }
-          });
-        }
+        }        
     </script>
 </body>
 </html>

@@ -91,6 +91,8 @@ Scene.prototype.desenhar = function(){
 
 //funcao para mover os sprites
 Scene.prototype.mover = function(dt){
+    
+    
     for(var i = 0; i<this.spritesE.length; i++){
         this.spritesE[i].mover(dt);
     }  
@@ -356,7 +358,7 @@ Scene.prototype.navigationBar = function(t){
              };
             if(pos.x> bt.x && pos.x < (bt.x+bt.w) && pos.y>bt.y && pos.y<(bt.y+bt.h)){
                 cena1.gameStart = 1;
-                adicionarListeners();
+                //adicionarListeners();
                 cena1.pcs.splice(1,1);
             }
             if(pos.x> bt2.x && pos.x < (bt2.x+bt2.w) && pos.y>bt2.y && pos.y<(bt2.y+bt2.h)){
@@ -402,7 +404,7 @@ Scene.prototype.navigationBar = function(t){
                     ctx.fillText("Arma: ",200,this.h-20);
                     var tipoTiro;
                     //mostra qual o tipo de tiro
-                    switch(pc.modeloTiro[pc.tiroCorrente]){
+                    switch(pc.tiroCorrente%pc.modeloTiro.length){
                         case 0:
                             tipoTiro = "Pistola";
                             ctx.fillStyle = "green";
@@ -455,7 +457,7 @@ Scene.prototype.navigationBar = function(t){
                         ctx.fillText("Arma: ",700,this.h-20);
                         var tipoTiro;
                         //mostra qual o tipo de tiro
-                        switch(pc2.modeloTiro[pc2.tiroCorrente]){
+                        switch(pc2.tiroCorrente%pc2.modeloTiro.length){
                             case 0:
                                 tipoTiro = "Pistola";
                                 ctx.fillStyle = "green";
@@ -591,8 +593,9 @@ Scene.prototype.passo = function(t,dt){
     this.gameDefiner(t);
     if(this.gameStart == 0){
         this.startPoint = t;
+    }else{
+        this.comportar();
     }
-    this.comportar();
     this.mover(dt);
     this.desenhar();
     this.navigationBar(t);

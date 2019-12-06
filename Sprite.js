@@ -27,6 +27,8 @@ function Sprite(params = {}) {
         drop: 0,
         lifebar: 30,
         pontuacao: 0,
+        changeCD: 0, 
+        turboTrigger:0, 
         teclas: {
             esquerda: 0,
             cima: 0,
