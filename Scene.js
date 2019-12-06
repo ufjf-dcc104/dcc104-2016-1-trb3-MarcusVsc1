@@ -310,7 +310,7 @@ Scene.prototype.navigationBar = function(t){
     if(this.stage==0){
         ctx.font = "10px Arial";
         ctx.fillText("Seu universo corre perigo! Invasores de outra galáxia pretendem conquistar tudo e todos.",20,this.h-76);
-        ctx.fillText("Defenda o o universo com uma nave poderosa!",20,this.h-56);
+        ctx.fillText("Defenda o o universo com uma nave poderosa! Obs: Esta versão também aceita joysticks.",20,this.h-56);
         ctx.fillText("Controles P1 - Direcionais: WASD / Tiro: J / Turbo: K / Mudar tipo de tiro: L",20,this.h-36);
         ctx.fillText("Controles P2 - Direcionais: Numpad da direita 8546 / Tiro: + / Turbo: Enter / Mudar tipo de tiro:  .",20,this.h-16);
         ctx.font = "30px Eurostile";
