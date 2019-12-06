@@ -13,4 +13,5 @@ Alterações com relação à primeira versão:
 Mudanças de código:
 
 1) Refatoração do arquivo Scene.js e divisão de responsabilidade para o GameManager.js
+
 Feito por Marcus Vinícius V. A. Cunha
