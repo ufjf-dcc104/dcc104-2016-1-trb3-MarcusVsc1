@@ -404,7 +404,7 @@ Scene.prototype.navigationBar = function(t){
                     ctx.fillText("Arma: ",200,this.h-20);
                     var tipoTiro;
                     //mostra qual o tipo de tiro
-                    switch(pc.tiroCorrente%pc.modeloTiro.length){
+                    switch(pc.modeloTiro[pc.tiroCorrente]){
                         case 0:
                             tipoTiro = "Pistola";
                             ctx.fillStyle = "green";
@@ -457,7 +457,7 @@ Scene.prototype.navigationBar = function(t){
                         ctx.fillText("Arma: ",700,this.h-20);
                         var tipoTiro;
                         //mostra qual o tipo de tiro
-                        switch(pc2.tiroCorrente%pc2.modeloTiro.length){
+                        switch(pc2.modeloTiro[pc2.tiroCorrente]){
                             case 0:
                                 tipoTiro = "Pistola";
                                 ctx.fillStyle = "green";

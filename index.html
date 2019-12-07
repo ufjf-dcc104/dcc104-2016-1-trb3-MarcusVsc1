@@ -120,11 +120,7 @@
 
         console.log(assetsMng);
 
-        var gerenciador = new GameManager();
-        
-        
-
-        
+        var gerenciador = new GameManager();      
 
         //variaveis de inicio de game
         var cena1 = new Scene({ctx: ctx, w: canvas.width, h: canvas.height, gameStart: 0, survivor: 0, newEnemy: criarInimigo, criarPoder: criarPowerUp, assets: assetsMng, gamer: gerenciador});
@@ -556,6 +552,9 @@
 
               if(input.comandos["trocaP"+this.playerNumber].valor && this.changeCD <= 0){
                 this.tiroCorrente++;
+                if(this.tiroCorrente == this.modeloTiro.length){
+                  this.tiroCorrente = 0;
+                }
                 this.changeCD = 2;
               }
               this.changeCD-= 0.2;
